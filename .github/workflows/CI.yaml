@@ -1,0 +1,45 @@
+name: React CI
+
+# Eventi che fanno partire automaticamente la GitHub Action
+on:
+  # Si attiva ad ogni push sul branch principale
+  push:
+    branches:
+      - main
+
+  # Si attiva quando viene aperta o aggiornata una Pull Request verso main
+  pull_request:
+    branches:
+      - main
+
+# Definizione dei lavori da eseguire
+jobs:
+  build-and-lint: # Nome del job
+    
+    # Ho scelto una macchina virtuale con Ubuntu come sistema operativo
+    runs-on: ubuntu-latest
+
+    steps:
+      
+      # Scarica il codice del repository dentro la macchina virtuale
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Node.js versione 24 nell'ambiente
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24      # Versione di Node da usare
+          cache: 'npm'          # Abilita la cache delle dipendenze per velocizzare le build future
+
+      # Installa tutte le dipendenze del progetto in modo pulito
+      - name: Install dependencies
+        run: npm ci             # Usa "npm ci" per installare le dipendenze in modo pulito
+
+      # Esegue la build di produzione dell'app React
+      - name: Build React app
+        run: npm run build      # Deve esistere lo script "build" nel package.json
+
+      # Controlla la qualità del codice con il linter
+      - name: Run linter
+        run: npm run lint       # Deve esistere lo script "lint" nel package.json
